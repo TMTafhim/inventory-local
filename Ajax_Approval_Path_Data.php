@@ -19,8 +19,7 @@ $approval_path_id=$_POST["approval_path_id"];
                       
                   </tr>
               </thead>
-              <tbody>
-				  
+              <tbody>okay
 				 <?php
 			
 				$sl=1;

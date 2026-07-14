@@ -290,6 +290,13 @@ if(!empty($_SESSION['LoginReGiSterSession'])){
               </li>
 
               <li class="nav-item ">
+                <a href="?Project_Reconciliation_Report/Report" class="nav-link <?php if(!empty($page_title) && ($page_title=='Project_Reconciliation_Report' )){ echo "active"; } ?>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Project Reconciliation</p>
+                </a>
+              </li>
+
+              <li class="nav-item ">
                 <a href="?Product_Usage_Search/Report" class="nav-link <?php if(!empty($page_title) && ($page_title=='Product_Usage_Search' )){ echo "active"; } ?>">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Product Usage Search</p>
