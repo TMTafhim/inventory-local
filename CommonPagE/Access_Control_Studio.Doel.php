@@ -317,7 +317,7 @@ function accessStudioMenuGroupName($menuName,$menuGroups){
                   <input type="text" name="designation_name" class="form-control" value="<?php echo htmlspecialchars($designation['name']); ?>" required>
                   <button class="btn btn-sm btn-outline-primary" type="submit" name="acs_designation_save"><i class="fas fa-save"></i></button>
                 </form>
-                <form method="post" action="?Access_Control_Studio/Administration" class="mb-0" onsubmit="return confirm('Delete this designation?');">
+                <form method="post" action="?Access_Control_Studio/Administration" class="mb-0" data-app-confirm="This designation will be deleted. Are you sure you want to continue?" data-confirm-title="Delete designation?" data-confirm-button="Yes, delete">
                   <input type="hidden" name="designation_id" value="<?php echo (int)$designation['id']; ?>">
                   <button class="btn btn-sm btn-outline-danger" type="submit" name="acs_designation_delete"><i class="fas fa-trash"></i></button>
                 </form>

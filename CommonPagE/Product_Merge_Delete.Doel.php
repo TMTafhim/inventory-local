@@ -65,7 +65,7 @@ $candidateProducts = $candidateStatement->fetchAll();
           <label>Duplicate product to keep</label>
           <input type="text" class="form-control" id="target_product_search" placeholder="Search product name or code" autocomplete="off" required>
         </div>
-        <button class="btn btn-danger" type="submit" name="Product_Merge_Delete" onclick="return confirm('Confirm merge? Old product will be deleted and all stock/reference will move to selected master product.');">
+        <button class="btn btn-danger" type="submit" name="Product_Merge_Delete" data-app-confirm="The old product will be deleted and all stock/reference will move to the selected master product. Are you sure you want to continue?" data-confirm-title="Merge products?" data-confirm-button="Yes, merge">
           <i class="fas fa-compress-arrows-alt"></i> Merge Stock & Delete
         </button>
         <a class="btn btn-secondary" href="?Product_Information/Setting">Cancel</a>

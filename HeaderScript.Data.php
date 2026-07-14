@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
  <!--Datatables End-->	
- <link rel="stylesheet" href="Custom/app-shell.css?v=20260629-modern-titlebar">
+ <link rel="stylesheet" href="Custom/app-shell.css?v=20260714-global-confirm">
 	
 	<style>
 .jodit_toolbar_btn-about{
@@ -111,8 +111,14 @@
 	}
 	.app-alert-actions{
 		padding:0 24px 24px;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		gap:12px;
 	}
-	.app-alert-ok{
+	.app-alert-ok,
+	.app-alert-cancel,
+	.app-alert-confirm{
 		min-width:128px;
 		border:0;
 		border-radius:8px;
@@ -122,6 +128,22 @@
 		font-size:16px;
 		font-weight:800;
 		cursor:pointer;
+	}
+	.app-alert-cancel{
+		background:#e2e8f0;
+		color:#334155;
+	}
+	.app-alert-confirm{
+		background:#dc2626;
+		color:#fff;
+	}
+	.app-alert-cancel:hover,
+	.app-alert-cancel:focus{
+		background:#cbd5e1;
+	}
+	.app-alert-confirm:hover,
+	.app-alert-confirm:focus{
+		background:#b91c1c;
 	}
 	.app-alert-dialog.error .app-alert-ok,
 	.app-alert-dialog.warning .app-alert-ok{
@@ -172,6 +194,160 @@
 				document.addEventListener('DOMContentLoaded', showDialog);
 			}
 		};
+		window.appConfirmAction = function(message, options) {
+			options = options || {};
+			return new Promise(function(resolve) {
+				var showDialog = function() {
+					var existingOverlay = document.getElementById('appConfirmOverlay');
+					if (existingOverlay) {
+						existingOverlay.remove();
+					}
+					var overlay = document.createElement('div');
+					overlay.id = 'appConfirmOverlay';
+					overlay.className = 'app-alert-overlay is-visible';
+					overlay.innerHTML =
+						'<div class="app-alert-dialog warning" role="alertdialog" aria-modal="true" aria-labelledby="appConfirmTitle">' +
+							'<div class="app-alert-head">' +
+								'<div class="app-alert-icon"><i class="fas fa-exclamation-triangle"></i></div>' +
+								'<h2 class="app-alert-title" id="appConfirmTitle"></h2>' +
+							'</div>' +
+							'<div class="app-alert-body"></div>' +
+							'<div class="app-alert-actions">' +
+								'<button type="button" class="app-alert-cancel"></button>' +
+								'<button type="button" class="app-alert-confirm"></button>' +
+							'</div>' +
+						'</div>';
+					document.body.appendChild(overlay);
+					overlay.querySelector('.app-alert-title').textContent = options.title || 'Please confirm';
+					overlay.querySelector('.app-alert-body').textContent = message || 'Are you sure you want to continue?';
+					var cancelButton = overlay.querySelector('.app-alert-cancel');
+					var confirmButton = overlay.querySelector('.app-alert-confirm');
+					cancelButton.textContent = options.cancelText || 'No, go back';
+					confirmButton.textContent = options.confirmText || 'Yes, continue';
+
+					var closeDialog = function(result) {
+						document.removeEventListener('keydown', escapeHandler);
+						overlay.remove();
+						resolve(result);
+					};
+					var escapeHandler = function(event) {
+						if (event.key === 'Escape') {
+							closeDialog(false);
+						}
+					};
+					cancelButton.addEventListener('click', function() { closeDialog(false); });
+					confirmButton.addEventListener('click', function() { closeDialog(true); });
+					overlay.addEventListener('click', function(event) {
+						if (event.target === overlay) {
+							closeDialog(false);
+						}
+					});
+					document.addEventListener('keydown', escapeHandler);
+					cancelButton.focus();
+				};
+				if (document.body) {
+					showDialog();
+				} else {
+					document.addEventListener('DOMContentLoaded', showDialog, { once: true });
+				}
+			});
+		};
+
+		(function() {
+			function normalizedActionText(element) {
+				return ((element.getAttribute('value') || '') + ' ' + (element.getAttribute('name') || '') + ' ' + (element.textContent || ''))
+					.replace(/\s+/g, ' ')
+					.trim()
+					.toLowerCase();
+			}
+
+			function actionConfirmation(element) {
+				var explicitElement = element.closest('[data-app-confirm]');
+				if (explicitElement) {
+					return {
+						message: explicitElement.getAttribute('data-app-confirm'),
+						title: explicitElement.getAttribute('data-confirm-title') || 'Please confirm',
+						confirmText: explicitElement.getAttribute('data-confirm-button') || 'Yes, continue'
+					};
+				}
+
+				var href = element.getAttribute('href') || '';
+				var text = normalizedActionText(element);
+				var className = typeof element.className === 'string' ? element.className.toLowerCase() : '';
+				var isRowRemoval = /(^|\s)(deleterow|ibtndel|delete-row|remove-[\w-]+)(\s|$)/.test(className);
+				var hasTrashIcon = !!element.querySelector('.fa-trash, .fa-trash-alt');
+
+				if (/sessiondistroy/i.test(href) || /(^|\s)sign\s*out(\s|$)/.test(text)) {
+					return { message: 'Are you sure you want to sign out of the system?', title: 'Sign out?', confirmText: 'Yes, sign out' };
+				}
+				if (/\/delete(?:_|\/|$)/i.test(href) || /btn-delete-action/.test(className)) {
+					return { message: 'This record will be removed. Are you sure you want to continue?', title: 'Delete record?', confirmText: 'Yes, delete' };
+				}
+				if (isRowRemoval || hasTrashIcon) {
+					return { message: 'Remove this item from the current form?', title: 'Remove item?', confirmText: 'Yes, remove' };
+				}
+				if (/\breject\b/.test(text)) {
+					return { message: 'This action will reject the request. Are you sure you want to continue?', title: 'Reject request?', confirmText: 'Yes, reject' };
+				}
+				if (/\bapprove\b/.test(text)) {
+					return { message: 'Please confirm that you want to approve this request.', title: 'Approve request?', confirmText: 'Yes, approve' };
+				}
+				if (/merge/.test(text)) {
+					return { message: 'The old product will be removed and its references will move to the selected master product. Continue?', title: 'Merge products?', confirmText: 'Yes, merge' };
+				}
+				if (/issue stock|final submit/.test(text)) {
+					return { message: 'This action changes operational records and may not be reversible. Continue?', title: 'Confirm action?', confirmText: 'Yes, continue' };
+				}
+				if (/history\.back/i.test(element.getAttribute('onclick') || '')) {
+					return { message: 'Any unsaved changes on this page will be lost. Do you want to leave?', title: 'Leave this page?', confirmText: 'Yes, leave' };
+				}
+				return null;
+			}
+
+			document.addEventListener('click', function(event) {
+				if (!event.target || typeof event.target.closest !== 'function') {
+					return;
+				}
+				var trigger = event.target.closest('a, button, input[type="button"], input[type="submit"]');
+				if (!trigger || trigger.hasAttribute('data-app-confirm-skip')) {
+					return;
+				}
+				if (trigger.getAttribute('data-app-confirm-bypass') === '1') {
+					trigger.removeAttribute('data-app-confirm-bypass');
+					return;
+				}
+				var confirmation = actionConfirmation(trigger);
+				if (!confirmation) {
+					return;
+				}
+				event.preventDefault();
+				event.stopImmediatePropagation();
+				window.appConfirmAction(confirmation.message, confirmation).then(function(confirmed) {
+					if (!confirmed) {
+						return;
+					}
+					var href = trigger.getAttribute('href') || '';
+					if (/history\.back/i.test(trigger.getAttribute('onclick') || '')) {
+						window.history.back();
+						return;
+					}
+					if (trigger.tagName === 'A' && href && href !== '#') {
+						window.location.assign(href);
+						return;
+					}
+					if ((trigger.type || '').toLowerCase() === 'submit' && trigger.form) {
+						if (typeof trigger.form.requestSubmit === 'function') {
+							trigger.form.requestSubmit(trigger);
+						} else {
+							trigger.form.submit();
+						}
+						return;
+					}
+					trigger.setAttribute('data-app-confirm-bypass', '1');
+					trigger.click();
+				});
+			}, true);
+		})();
 		window.alert = function(message) {
 			window.appShowAlert(message, 'warning', 'Attention');
 		};

@@ -189,70 +189,22 @@
           <i class="fas fa-th-large"></i>
         </a>
       </li>
-	<style>
-li.user-header {
-  height: 150px;
-  padding: 10px;
-  text-align: center;
-  
-  box-sizing: border-box; 			 
-}
-.dropdown-menu> .user-header {
-  border-top-right-radius: 0;
-  border-top-left-radius: 0;
-  padding: 1px 0 0 0;
-  border-top-width: 0;
-  width: 280px;
-}		
-.dropdown-menu > li.user-header > p {
-  z-index: 5;
-  color: #000;
-  
-  font-size: 17px;
-  margin-top: 10px;
-}	
-.dropdown-menu > .user-footer {
-
-  padding: 10px;
-}
-.pull-left {
-  float: left !important;
-}
-	
-.pull-right {
-  float: right !important;
-}
-		
-		</style>
 		<!--User Login Start-->
-		<li class="nav-item dropdown">
-            <a href="#" class="dropdown-toggle app-user-toggle" data-toggle="dropdown">
-			
-            <img src="<?php if(!empty($_SESSION['PHOTO'])){ echo "HRPhoto/".$_SESSION['PHOTO']; }else{ echo $organizationlogo; } ?>" class="img-circle " style="height: auto;width: 2.1rem;" alt="<?php echo $_SESSION['LOGINNAME']; ?> ">
-                            <span class="hidden-xs"><?php echo $_SESSION['LOGINNAME']; ?></span>
-            </a>
-            <ul class="dropdown-menu" >
-              <!-- User image -->
-              <li class="user-header">
-                              <img src="<?php if(!empty($_SESSION['PHOTO'])){ echo "HRPhoto/".$_SESSION['PHOTO']; }else{ echo $organizationlogo; } ?>" class="img-circle" alt="<?php echo $_SESSION['LOGINNAME']; ?>" style="height: auto;
-    width: 3rem;">
-                <p>
-                  <?php echo $_SESSION['LOGINNAME']; if(!empty($_SESSION['DESIGNATION'])){ echo "-".$_SESSION['DESIGNATION'];} ?>                 
-                </p>
-              </li>
-              <!-- Menu Body -->
-              
-              <!-- Menu Footer-->
-              <li class="user-footer">
-                <div class="pull-left">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                </div>
-                <div class="pull-right">
-                  <a href="?<?php echo $page_title; ?>/SessionDistroy" class="btn btn-default btn-flat">Sign out</a>
-                </div>
-              </li>
-            </ul>
-          </li>
+		<li class="nav-item app-user-inline">
+          <span class="app-user-toggle app-user-identity" title="<?php echo htmlspecialchars($_SESSION['LOGINNAME'], ENT_QUOTES, 'UTF-8'); ?><?php if(!empty($_SESSION['DESIGNATION'])){ echo ' - '.htmlspecialchars($_SESSION['DESIGNATION'], ENT_QUOTES, 'UTF-8'); } ?>">
+            <img src="<?php if(!empty($_SESSION['PHOTO'])){ echo "HRPhoto/".$_SESSION['PHOTO']; }else{ echo $organizationlogo; } ?>" class="img-circle" alt="<?php echo htmlspecialchars($_SESSION['LOGINNAME'], ENT_QUOTES, 'UTF-8'); ?>">
+            <span class="hidden-xs"><?php echo htmlspecialchars($_SESSION['LOGINNAME'], ENT_QUOTES, 'UTF-8'); ?></span>
+          </span>
+          <a href="?<?php echo urlencode($page_title); ?>/SessionDistroy"
+             class="nav-link app-signout-link"
+             aria-label="Sign out"
+             title="Sign out"
+             data-app-confirm="Are you sure you want to sign out of the system?"
+             data-confirm-title="Sign out?"
+             data-confirm-button="Yes, sign out">
+            <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+          </a>
+        </li>
 		<!--User Login End-->	
 		
 		

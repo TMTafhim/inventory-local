@@ -2044,7 +2044,7 @@ th,td{
 						<input type="hidden" name="super_admin_form_complete" value="1">
 						<div class="d-flex justify-content-between align-items-center">
 						<button type="button" class="btn btn-outline-primary" id="addSuperAdminProduct"><i class="fas fa-plus"></i> Add Product</button>
-						<button type="submit" class="btn btn-primary" onclick="return confirm('Save requisition changes?');"><i class="fas fa-save"></i> Save Changes</button>
+						<button type="submit" class="btn btn-primary" data-app-confirm="Save these requisition changes?" data-confirm-title="Save changes?" data-confirm-button="Yes, save"><i class="fas fa-save"></i> Save Changes</button>
 					</div>
 				</form>
 			</div>
