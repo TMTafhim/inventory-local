@@ -1,0 +1,61 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Database dumps (keep migration scripts versioned)
+/BDB/*.sql
+!/BDB/migrations/
+!/BDB/migrations/**/*.sql
+*.sql.gz
+*.sql.bz2
+*.sql.zip
+
+# Local/demo copies and backup archives
+/demo/
+/backup/
+/backups/
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+
+# Runtime uploads and generated documents
+/HRPhoto/
+/HRCV/
+/Signature/
+/image/
+/CompanyImg/
+/PurchaseHistory/
+/RequistionAttachment/
+/StockTransfer/
+/DoctorDoc/
+/ReturnHistory/
+/NoticeAttachment/
+
+# Logs, cache, and temporary files
+*.log
+/error_log
+/tmp/
+/cache/
+*.tmp
+*.temp
+*.cache
+
+# Composer-generated dependencies
+/vendor/
+
+# IDE and operating-system metadata
+/.idea/
+/.vscode/
+/.fleet/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local AI-agent metadata
+/.agents/
+/.codex/
+
