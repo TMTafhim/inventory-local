@@ -309,7 +309,7 @@
 					return;
 				}
 				var trigger = event.target.closest('a, button, input[type="button"], input[type="submit"]');
-				if (!trigger || trigger.hasAttribute('data-app-confirm-skip')) {
+				if (!trigger || trigger.closest('.app-alert-overlay') || trigger.hasAttribute('data-app-confirm-skip')) {
 					return;
 				}
 				if (trigger.getAttribute('data-app-confirm-bypass') === '1') {
