@@ -254,22 +254,7 @@ foreach ($reconRows as $reconRow) {
 }
 ?>
 
-<style>
-.recon-filter-card .form-group { margin-bottom: .75rem; }
-.recon-formula { background: #f4f8ff; border-left: 4px solid #007bff; border-radius: 4px; color: #334155; padding: .75rem 1rem; }
-.recon-summary .small-box { min-height: 108px; margin-bottom: 1rem; }
-.recon-summary .small-box .inner h3 { font-size: 1.35rem; }
-.recon-summary .small-box .inner p { margin-bottom: 0; }
-.recon-status { border-radius: 20px; display: inline-block; font-size: .75rem; font-weight: 700; padding: .3rem .65rem; white-space: nowrap; }
-.recon-status-outstanding { background: #fff3cd; color: #856404; }
-.recon-status-balanced { background: #d4edda; color: #155724; }
-.recon-status-over { background: #f8d7da; color: #721c24; }
-.recon-negative { color: #c82333; font-weight: 700; }
-.recon-positive { color: #b26a00; font-weight: 700; }
-.recon-zero { color: #218838; font-weight: 700; }
-</style>
-
-<section class="content">
+<section class="content project-reconciliation-report">
   <div class="card recon-filter-card">
     <div class="card-header">
       <h3 class="card-title">Project Material Reconciliation</h3>
@@ -292,7 +277,7 @@ foreach ($reconRows as $reconRow) {
         <div class="row">
           <div class="col-lg-3 col-md-6">
             <div class="form-group">
-              <label for="recon_project_id">Project</label>
+              <label for="recon_project_id">Project Name</label>
               <select class="form-control select2" id="recon_project_id" name="project_id" style="width:100%;">
                 <option value="">All Projects</option>
                 <?php foreach ($projectOptions as $projectOption) {
@@ -309,7 +294,7 @@ foreach ($reconRows as $reconRow) {
 
           <div class="col-lg-3 col-md-6">
             <div class="form-group">
-              <label for="recon_store_id">Store</label>
+              <label for="recon_store_id">Store Name</label>
               <select class="form-control select2" id="recon_store_id" name="store_id" style="width:100%;">
                 <option value="">All Stores</option>
                 <?php foreach ($storeOptions as $storeOption) { ?>
@@ -321,7 +306,7 @@ foreach ($reconRows as $reconRow) {
 
           <div class="col-lg-3 col-md-6">
             <div class="form-group">
-              <label for="recon_product_id">Product</label>
+              <label for="recon_product_id">Product Name / Code</label>
               <select class="form-control select2" id="recon_product_id" name="product_id" style="width:100%;">
                 <option value="">All Products</option>
                 <?php foreach ($productOptions as $productOption) {
@@ -335,7 +320,7 @@ foreach ($reconRows as $reconRow) {
 
           <div class="col-lg-3 col-md-6">
             <div class="form-group">
-              <label for="reconciliation_status">Status</label>
+              <label for="reconciliation_status">Reconciliation Status</label>
               <select class="form-control" id="reconciliation_status" name="reconciliation_status">
                 <option value="all" <?php echo $reconStatus === 'all' ? 'selected' : ''; ?>>All Statuses</option>
                 <option value="outstanding" <?php echo $reconStatus === 'outstanding' ? 'selected' : ''; ?>>Outstanding</option>
@@ -347,14 +332,14 @@ foreach ($reconRows as $reconRow) {
 
           <div class="col-lg-3 col-md-6">
             <div class="form-group">
-              <label for="recon_from_date">From Date</label>
+              <label for="recon_from_date">Period Start Date</label>
               <input type="date" class="form-control" id="recon_from_date" name="from_date" value="<?php echo projectReconText($reconFromDate); ?>" required>
             </div>
           </div>
 
           <div class="col-lg-3 col-md-6">
             <div class="form-group">
-              <label for="recon_to_date">To Date</label>
+              <label for="recon_to_date">Period End Date</label>
               <input type="date" class="form-control" id="recon_to_date" name="to_date" value="<?php echo projectReconText($reconToDate); ?>" required>
             </div>
           </div>
@@ -373,25 +358,51 @@ foreach ($reconRows as $reconRow) {
         </div>
       </form>
 
-      <div class="recon-formula mt-2">
-        <strong>Closing Outstanding</strong> = Opening + Distribution + Emergency Issued - Used - Returned - Damaged.
-        <span class="ml-2"><strong>Emergency Pending</strong> = Emergency Issued - Emergency Reconciled.</span>
+      <div class="callout callout-info mt-2 mb-0">
+        <div><strong>Opening Balance:</strong> Unreconciled quantity accumulated before the Period Start Date.</div>
+        <div><strong>Closing Outstanding:</strong> Opening + Distributed + Emergency Issued - Used - Returned - Damaged.</div>
+        <div><strong>Emergency Pending:</strong> Total Emergency Issued - Total Emergency Reconciled, calculated up to the Period End Date.</div>
+        <small class="text-muted">All values are quantities in each product's own unit. Totals containing mixed units (for example, Nos + Kg) are for reference only.</small>
       </div>
     </div>
   </div>
 
-  <div class="row recon-summary">
-    <div class="col-xl-3 col-md-6">
-      <div class="small-box bg-info"><div class="inner"><h3><?php echo projectReconQuantity($reconTotals['distributed_quantity']); ?></h3><p>Period Distribution</p></div><div class="icon"><i class="fas fa-truck-loading"></i></div></div>
+  <div class="row">
+    <div class="col-md-3 col-6">
+      <div class="info-box mb-3">
+        <span class="info-box-icon bg-info"><i class="fas fa-truck-loading"></i></span>
+        <div class="info-box-content">
+          <span class="info-box-text">Distributed Qty (In Period)</span>
+          <span class="info-box-number"><?php echo projectReconQuantity($reconTotals['distributed_quantity']); ?></span>
+        </div>
+      </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-      <div class="small-box bg-primary"><div class="inner"><h3><?php echo projectReconQuantity($reconTotals['emergency_issued_quantity']); ?></h3><p>Emergency Issued</p></div><div class="icon"><i class="fas fa-bolt"></i></div></div>
+    <div class="col-md-3 col-6">
+      <div class="info-box mb-3">
+        <span class="info-box-icon bg-warning"><i class="fas fa-bolt"></i></span>
+        <div class="info-box-content">
+          <span class="info-box-text">Emergency Issued Qty (In Period)</span>
+          <span class="info-box-number"><?php echo projectReconQuantity($reconTotals['emergency_issued_quantity']); ?></span>
+        </div>
+      </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-      <div class="small-box bg-success"><div class="inner"><h3><?php echo projectReconQuantity($reconTotals['used_quantity'] + $reconTotals['return_quantity']); ?></h3><p>Used + Returned</p></div><div class="icon"><i class="fas fa-check-circle"></i></div></div>
+    <div class="col-md-3 col-6">
+      <div class="info-box mb-3">
+        <span class="info-box-icon bg-success"><i class="fas fa-check-circle"></i></span>
+        <div class="info-box-content">
+          <span class="info-box-text">Used + Returned Qty (In Period)</span>
+          <span class="info-box-number"><?php echo projectReconQuantity($reconTotals['used_quantity'] + $reconTotals['return_quantity']); ?></span>
+        </div>
+      </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-      <div class="small-box bg-warning"><div class="inner"><h3><?php echo projectReconQuantity($reconTotals['closing_outstanding']); ?></h3><p>Closing Outstanding</p></div><div class="icon"><i class="fas fa-balance-scale"></i></div></div>
+    <div class="col-md-3 col-6">
+      <div class="info-box mb-3">
+        <span class="info-box-icon bg-secondary"><i class="fas fa-balance-scale"></i></span>
+        <div class="info-box-content">
+          <span class="info-box-text">Closing Outstanding Qty (To Date)</span>
+          <span class="info-box-number"><?php echo projectReconQuantity($reconTotals['closing_outstanding']); ?></span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -406,21 +417,21 @@ foreach ($reconRows as $reconRow) {
           <thead>
             <tr>
               <th>SL</th>
-              <th>Project</th>
-              <th>Store</th>
+              <th>Project Name</th>
+              <th>Related Store(s)</th>
               <th>Product Code</th>
               <th>Product Name</th>
               <th>Unit</th>
-              <th>Opening</th>
-              <th>Distributed</th>
-              <th>Emergency Issued</th>
-              <th>Emergency Reconciled</th>
-              <th>Used</th>
-              <th>Returned</th>
-              <th>Damaged</th>
-              <th>Emergency Pending</th>
-              <th>Closing Outstanding</th>
-              <th>Status</th>
+              <th>Opening Qty (Before Period)</th>
+              <th>Distributed Qty (In Period)</th>
+              <th>Emergency Issued Qty (In Period)</th>
+              <th>Emergency Reconciled Qty (In Period)</th>
+              <th>Used Qty (In Period)</th>
+              <th>Returned Qty (In Period)</th>
+              <th>Damaged Qty (In Period)</th>
+              <th>Emergency Pending Qty (To Date)</th>
+              <th>Closing Outstanding Qty (To Date)</th>
+              <th>Reconciliation Status</th>
             </tr>
           </thead>
           <tbody>
@@ -428,16 +439,16 @@ foreach ($reconRows as $reconRow) {
                 $closingOutstanding = projectReconNumber($reconRow['closing_outstanding']);
                 if ($closingOutstanding > 0.0001) {
                     $statusLabel = 'Outstanding';
-                    $statusClass = 'recon-status-outstanding';
-                    $quantityClass = 'recon-positive';
+                    $statusClass = 'badge-warning';
+                    $quantityClass = 'text-warning font-weight-bold';
                 } elseif ($closingOutstanding < -0.0001) {
                     $statusLabel = 'Over Reconciled';
-                    $statusClass = 'recon-status-over';
-                    $quantityClass = 'recon-negative';
+                    $statusClass = 'badge-danger';
+                    $quantityClass = 'text-danger font-weight-bold';
                 } else {
                     $statusLabel = 'Balanced';
-                    $statusClass = 'recon-status-balanced';
-                    $quantityClass = 'recon-zero';
+                    $statusClass = 'badge-success';
+                    $quantityClass = 'text-success font-weight-bold';
                 }
                 $projectDisplay = $reconRow['project_name'];
                 if (!empty($reconRow['project_location'])) {
@@ -460,13 +471,13 @@ foreach ($reconRows as $reconRow) {
                 <td><?php echo projectReconQuantity($reconRow['damage_quantity']); ?></td>
                 <td><?php echo projectReconQuantity($reconRow['emergency_pending_quantity']); ?></td>
                 <td class="<?php echo $quantityClass; ?>"><?php echo projectReconQuantity($closingOutstanding); ?></td>
-                <td><span class="recon-status <?php echo $statusClass; ?>"><?php echo $statusLabel; ?></span></td>
+                <td><span class="badge badge-pill <?php echo $statusClass; ?> px-2 py-1"><?php echo $statusLabel; ?></span></td>
               </tr>
             <?php } ?>
           </tbody>
           <tfoot>
             <tr>
-              <th colspan="6" class="text-right">Totals</th>
+              <th colspan="6" class="text-right">Quantity Totals (Mixed Units)</th>
               <th><?php echo projectReconQuantity($reconTotals['opening_balance']); ?></th>
               <th><?php echo projectReconQuantity($reconTotals['distributed_quantity']); ?></th>
               <th><?php echo projectReconQuantity($reconTotals['emergency_issued_quantity']); ?></th>
